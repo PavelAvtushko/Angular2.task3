@@ -1,2 +1,3 @@
-# Angular2.task3
-npm run build
+# Angular2
+
+# npm install -> npm run build -> localhost:3000

@@ -1,0 +1,26 @@
+<!--<div class="home-page">-->
+<div class="home-page" *ngIf="courseList">
+	<search-form
+		class="row"
+		(showForm) = "showForm($event)"
+		(findCourses)="findCourses($event)">
+	</search-form>
+	<edit-form 
+		class="row"
+		*ngIf="isShowingForm"
+		[courseData] = "courseData"
+		(addNewCourse)="addNewCourse($event)"
+		(showForm) = "showForm($event)">
+	</edit-form>
+	<div class="row line"></div>
+	<div class="row">
+		<course-item *ngFor="let course of courseList"
+			[course]="course"
+			(deleteCourse)="deleteCourse($event)"
+			(editCourse)="editCourse($event)">
+		</course-item>
+	</div>
+	<!--<div class="row line"></div>
+	<pie-chart [chartData]="chartData" [chartName]="chartName"></pie-chart>-->
+	<div *ngIf="isLoading">Is loading...</div>
+</div>
