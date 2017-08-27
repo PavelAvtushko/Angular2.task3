@@ -1,5 +1,5 @@
 <!--<div class="home-page">-->
-<div class="home-page" *ngIf="courseList">
+<div class="home-page" *ngIf="courseList" (mousemove)="hand($event)">
 	<search-form
 		class="row"
 		(showForm) = "showForm($event)"
@@ -16,8 +16,10 @@
 	<div class="row">
 		<course-item *ngFor="let course of courseList"
 			[course]="course"
+			[coord]="coord"
 			(deleteCourse)="deleteCourse($event)"
-			(editCourse)="editCourse($event)">
+			(editCourse)="editCourse($event)"
+			(checkCourseItem)="checkCourseItem($event)">
 		</course-item>
 	</div>
 	<!--<div class="row line"></div>

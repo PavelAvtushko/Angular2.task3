@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 	private isShowingForm: boolean = false;
 	private chartData: any;
 	private chartName: string;
-
+	private coord = {left:0, top:0};
 	private userName: string;
 
 	constructor(
@@ -62,6 +62,16 @@ export class HomeComponent implements OnInit, OnDestroy {
 		this.courseService.removeItem(this.userName, course.id);
 		this.courseList = this.courseList.filter((elem) => elem !== course);
 		this.showForm(false);
+	}
+
+	public checkCourseItem = (course: CourseItem): void => {
+		console.log('mousedown on element', course);
+		console.log(this.coord.left, this.coord.top);
+	}
+
+	public hand ($event){
+		this.coord.left = $event.pageX;
+		this.coord.top = $event.pageY;
 	}
 
 	public editCourse = (course: CourseItem): void => {

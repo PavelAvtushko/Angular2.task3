@@ -89,10 +89,15 @@ var HomeComponent = (function () {
         this.authenticationService = authenticationService;
         this.isLoading = false;
         this.isShowingForm = false;
+        this.coord = { left: 0, top: 0 };
         this.deleteCourse = function (course) {
             _this.courseService.removeItem(_this.userName, course.id);
             _this.courseList = _this.courseList.filter(function (elem) { return elem !== course; });
             _this.showForm(false);
+        };
+        this.checkCourseItem = function (course) {
+            console.log('mousedown on element', course);
+            console.log(_this.coord.left, _this.coord.top);
         };
         this.editCourse = function (course) {
             _this.courseData = course;
@@ -130,6 +135,10 @@ var HomeComponent = (function () {
     HomeComponent.prototype.ngOnDestroy = function () {
         // this.todoServiceSubscription.unsubscribe();
         this.authenticationSubscription.unsubscribe();
+    };
+    HomeComponent.prototype.hand = function ($event) {
+        this.coord.left = $event.pageX;
+        this.coord.top = $event.pageY;
     };
     HomeComponent.prototype.findCourses = function (request) {
         this.courseList = this.courseService.findItems(this.userName, request);
@@ -1179,7 +1188,39 @@ var CourseItemComponent = (function () {
     function CourseItemComponent() {
         this.deleteCourse = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
         this.editCourse = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
+        this.checkCourseItem = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
     }
+    CourseItemComponent.prototype.mouseDown = function (course) {
+        //console.log('mouse down');
+        // console.log(coord.left);
+        // console.log(coord.right);
+        this.checkCourseItem.emit(course);
+    };
+    // public event() {
+    // 	var blueberries = document.getElementById('blueberries');
+    // 	blueberries.ondragstart = function () {
+    // 		return false;
+    // 	};
+    // 	blueberries.onmousedown = function (e) {
+    // 		var clientRect = getClientRect(blueberries);
+    // 		var shiftX = e.pageX - clientRect.left;
+    // 		var shiftY = e.pageY - clientRect.top;
+    // 		blueberries.style.position = 'absolute';
+    // 		document.body.appendChild(blueberries);
+    // 		moveAt(e, shiftX, shiftY);
+    // 		document.onmousemove = function (e) {
+    // 			moveAt(e, shiftX, shiftY);
+    // 		};
+    // 		blueberries.onmouseup = function () {
+    // 			document.onmousemove = null;
+    // 			blueberries.onmouseup = null;
+    // 		};
+    // 	}
+    // 	function moveAt(e, shiftX, shiftY) {
+    // 		blueberries.style.left = e.pageX - shiftX + 'px';
+    // 		blueberries.style.top = e.pageY - shiftY + 'px';
+    // 	}
+    // }
     CourseItemComponent.prototype.onEditCourse = function (course) {
         this.editCourse.emit(course);
     };
@@ -1193,6 +1234,10 @@ __WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __decorate */]([
     __WEBPACK_IMPORTED_MODULE_0_tslib__["b" /* __metadata */]("design:type", __WEBPACK_IMPORTED_MODULE_2__core_entities__["a" /* CourseItem */])
 ], CourseItemComponent.prototype, "course", void 0);
 __WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __decorate */]([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_core__["Input"])(),
+    __WEBPACK_IMPORTED_MODULE_0_tslib__["b" /* __metadata */]("design:type", Object)
+], CourseItemComponent.prototype, "coord", void 0);
+__WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __decorate */]([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_core__["Output"])(),
     __WEBPACK_IMPORTED_MODULE_0_tslib__["b" /* __metadata */]("design:type", __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"])
 ], CourseItemComponent.prototype, "deleteCourse", void 0);
@@ -1200,6 +1245,10 @@ __WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __decorate */]([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_core__["Output"])(),
     __WEBPACK_IMPORTED_MODULE_0_tslib__["b" /* __metadata */]("design:type", __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"])
 ], CourseItemComponent.prototype, "editCourse", void 0);
+__WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __decorate */]([
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_core__["Output"])(),
+    __WEBPACK_IMPORTED_MODULE_0_tslib__["b" /* __metadata */]("design:type", __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"])
+], CourseItemComponent.prototype, "checkCourseItem", void 0);
 CourseItemComponent = __WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __decorate */]([
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_core__["Component"])({
         selector: 'course-item',
@@ -1948,7 +1997,7 @@ module.exports = "<div>\r\n\t<nav class=\"main-navbar\">\r\n\t\t<div class=\"con
 /* 107 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"list-group course-item\">\r\n\t<header class=\"list-group-item\">\r\n\t\t<h4 class=\"overflow\">{{course.name}}</h4>\r\n\t</header>\r\n\t<main class=\"list-group-item top-border-none\">\r\n\t\t<div>\r\n\t\t\t<h5 class=\"overflow\">{{course.description}}</h5>\r\n\t\t\t<h5 class=\"overflow\">Cases</h5>\r\n\t\t\t<div class=\"text-right\">{{course.date | date : 'MMM, dd yyyy: HH:mm'}}</div>\r\n\t\t\t<div class=\"text-right\">{{course.duration}}</div>\r\n\t\t</div>\r\n\t</main>\r\n\t<footer class=\"list-group-item\">\r\n\t\t<div class=\"text-right\">\r\n\t\t\t<button type=\"button\" class=\"btn-link btn-xs\" (click)=onEditCourse(course)>Edit</button>\r\n\t\t\t<button type=\"button\" class=\"btn-link btn-xs\" (click)=onDeleteCourse(course)>Delete</button>\r\n\t\t</div>\r\n\t</footer>\r\n</div>\r\n"
+module.exports = "<div class=\"list-group course-item\" (mousedown)=\"mouseDown(course)\">\r\n\t<header class=\"list-group-item\">\r\n\t\t<h4 class=\"overflow\">{{course.name}}</h4>\r\n\t</header>\r\n\t<main class=\"list-group-item top-border-none\">\r\n\t\t<div>\r\n\t\t\t<h5 class=\"overflow\">{{course.description}}</h5>\r\n\t\t\t<h5 class=\"overflow\">Cases</h5>\r\n\t\t\t<div class=\"text-right\">{{course.date | date : 'MMM, dd yyyy: HH:mm'}}</div>\r\n\t\t\t<div class=\"text-right\">{{course.duration}}</div>\r\n\t\t</div>\r\n\t</main>\r\n\t<footer class=\"list-group-item\">\r\n\t\t<div class=\"text-right\">\r\n\t\t\t<button type=\"button\" class=\"btn-link btn-xs\" (click)=onEditCourse(course)>Edit</button>\r\n\t\t\t<button type=\"button\" class=\"btn-link btn-xs\" (click)=onDeleteCourse(course)>Delete</button>\r\n\t\t</div>\r\n\t</footer>\r\n</div>\r\n"
 
 /***/ }),
 /* 108 */
@@ -1960,7 +2009,7 @@ module.exports = "<div class=\"container border\">\r\n\t<form class=\"form-horiz
 /* 109 */
 /***/ (function(module, exports) {
 
-module.exports = "<!--<div class=\"home-page\">-->\r\n<div class=\"home-page\" *ngIf=\"courseList\">\r\n\t<search-form\r\n\t\tclass=\"row\"\r\n\t\t(showForm) = \"showForm($event)\"\r\n\t\t(findCourses)=\"findCourses($event)\">\r\n\t</search-form>\r\n\t<edit-form \r\n\t\tclass=\"row\"\r\n\t\t*ngIf=\"isShowingForm\"\r\n\t\t[courseData] = \"courseData\"\r\n\t\t(addNewCourse)=\"addNewCourse($event)\"\r\n\t\t(showForm) = \"showForm($event)\">\r\n\t</edit-form>\r\n\t<div class=\"row line\"></div>\r\n\t<div class=\"row\">\r\n\t\t<course-item *ngFor=\"let course of courseList\"\r\n\t\t\t[course]=\"course\"\r\n\t\t\t(deleteCourse)=\"deleteCourse($event)\"\r\n\t\t\t(editCourse)=\"editCourse($event)\">\r\n\t\t</course-item>\r\n\t</div>\r\n\t<!--<div class=\"row line\"></div>\r\n\t<pie-chart [chartData]=\"chartData\" [chartName]=\"chartName\"></pie-chart>-->\r\n\t<div *ngIf=\"isLoading\">Is loading...</div>\r\n</div>\r\n"
+module.exports = "<!--<div class=\"home-page\">-->\r\n<div class=\"home-page\" *ngIf=\"courseList\" (mousemove)=\"hand($event)\">\r\n\t<search-form\r\n\t\tclass=\"row\"\r\n\t\t(showForm) = \"showForm($event)\"\r\n\t\t(findCourses)=\"findCourses($event)\">\r\n\t</search-form>\r\n\t<edit-form \r\n\t\tclass=\"row\"\r\n\t\t*ngIf=\"isShowingForm\"\r\n\t\t[courseData] = \"courseData\"\r\n\t\t(addNewCourse)=\"addNewCourse($event)\"\r\n\t\t(showForm) = \"showForm($event)\">\r\n\t</edit-form>\r\n\t<div class=\"row line\"></div>\r\n\t<div class=\"row\">\r\n\t\t<course-item *ngFor=\"let course of courseList\"\r\n\t\t\t[course]=\"course\"\r\n\t\t\t[coord]=\"coord\"\r\n\t\t\t(deleteCourse)=\"deleteCourse($event)\"\r\n\t\t\t(editCourse)=\"editCourse($event)\"\r\n\t\t\t(checkCourseItem)=\"checkCourseItem($event)\">\r\n\t\t</course-item>\r\n\t</div>\r\n\t<!--<div class=\"row line\"></div>\r\n\t<pie-chart [chartData]=\"chartData\" [chartName]=\"chartName\"></pie-chart>-->\r\n\t<div *ngIf=\"isLoading\">Is loading...</div>\r\n</div>\r\n"
 
 /***/ }),
 /* 110 */
