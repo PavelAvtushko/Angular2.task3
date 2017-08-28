@@ -83,8 +83,12 @@ export class CourseService {
 
 	public updateItem(userName: string, data: CourseItem) {
 		if (DBdata[userName]) {
-			const currentCourse = DBdata[userName].find((item) => item.id === data.id);
+			const currentCourse = DBdata[userName].find((item) => {
+				return item.id === data.id
+			});
 			currentCourse.modifyCourse(data);
+			let index = DBdata[userName].indexOf(currentCourse);
+			DBdata[userName][index] = DBdata[userName][index].createCopyWithData(currentCourse, data ) ;
 			return DBdata[userName];
 		}
 	}

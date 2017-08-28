@@ -1,6 +1,6 @@
-import { Component, ViewEncapsulation, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, ViewEncapsulation, OnInit, OnDestroy, Input} from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, ElementRef } from '@angular/core';
 import { CourseService, ChartService, AuthenticationService } from '../../core/services';
 import { CourseItem } from '../../core/entities';
 
@@ -32,7 +32,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 		// private todoService: TodoService,
 		private courseService: CourseService,
 		private chartService: ChartService,
-		private authenticationService: AuthenticationService) {
+		private authenticationService: AuthenticationService,
+		private elementRef: ElementRef) {
 	}
 
 	public ngOnInit() {
@@ -66,7 +67,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
 	public checkCourseItem = (course: CourseItem): void => {
 		console.log('mousedown on element', course);
-		console.log(this.coord.left, this.coord.top);
+		//console.log(this.coord.left, this.coord.top);
 	}
 
 	public hand ($event){

@@ -15,10 +15,25 @@ export class CourseItem {
 		this.duration = data.duration || 'no info';
 	}
 
+	public setID(id: string): void {
+		this.id = id;
+	}
+
+	public setDate(date: Date): void {
+		this.date = date;
+	}
+
 	public modifyCourse(data: CourseData): void {
 		this.name = data.name || 'no name';
 		this.description = data.description || 'no description';
 		this.duration = data.duration || 'no info';
+	}
+
+	public createCopyWithData(element: CourseItem, data: CourseData): CourseItem {
+		let courseCopy = new CourseItem(data);
+		courseCopy.id = element.id;
+		courseCopy.date = element.date;
+		return courseCopy;
 	}
 
 	private generateID(): string {

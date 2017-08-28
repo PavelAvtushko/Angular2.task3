@@ -79,14 +79,16 @@ module.exports = (__webpack_require__(5))(440);
 
 
 
+
 var HomeComponent = (function () {
     function HomeComponent(
         // private todoService: TodoService,
-        courseService, chartService, authenticationService) {
+        courseService, chartService, authenticationService, elementRef) {
         var _this = this;
         this.courseService = courseService;
         this.chartService = chartService;
         this.authenticationService = authenticationService;
+        this.elementRef = elementRef;
         this.isLoading = false;
         this.isShowingForm = false;
         this.coord = { left: 0, top: 0 };
@@ -97,7 +99,7 @@ var HomeComponent = (function () {
         };
         this.checkCourseItem = function (course) {
             console.log('mousedown on element', course);
-            console.log(_this.coord.left, _this.coord.top);
+            //console.log(this.coord.left, this.coord.top);
         };
         this.editCourse = function (course) {
             _this.courseData = course;
@@ -155,7 +157,8 @@ HomeComponent = __WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __decorate */]([
     }),
     __WEBPACK_IMPORTED_MODULE_0_tslib__["b" /* __metadata */]("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2__core_services__["b" /* CourseService */],
         __WEBPACK_IMPORTED_MODULE_2__core_services__["c" /* ChartService */],
-        __WEBPACK_IMPORTED_MODULE_2__core_services__["d" /* AuthenticationService */]])
+        __WEBPACK_IMPORTED_MODULE_2__core_services__["d" /* AuthenticationService */],
+        __WEBPACK_IMPORTED_MODULE_1__angular_core__["ElementRef"]])
 ], HomeComponent);
 
 
@@ -793,10 +796,22 @@ var CourseItem = (function () {
         this.id = this.generateID();
         this.duration = data.duration || 'no info';
     }
+    CourseItem.prototype.setID = function (id) {
+        this.id = id;
+    };
+    CourseItem.prototype.setDate = function (date) {
+        this.date = date;
+    };
     CourseItem.prototype.modifyCourse = function (data) {
         this.name = data.name || 'no name';
         this.description = data.description || 'no description';
         this.duration = data.duration || 'no info';
+    };
+    CourseItem.prototype.createCopyWithData = function (element, data) {
+        var courseCopy = new CourseItem(data);
+        courseCopy.id = element.id;
+        courseCopy.date = element.date;
+        return courseCopy;
     };
     CourseItem.prototype.generateID = function () {
         var randomNumber = Math.ceil(Math.random() * 10000);
@@ -1113,8 +1128,12 @@ var CourseService = (function () {
     };
     CourseService.prototype.updateItem = function (userName, data) {
         if (DBdata[userName]) {
-            var currentCourse = DBdata[userName].find(function (item) { return item.id === data.id; });
+            var currentCourse = DBdata[userName].find(function (item) {
+                return item.id === data.id;
+            });
             currentCourse.modifyCourse(data);
+            var index = DBdata[userName].indexOf(currentCourse);
+            DBdata[userName][index] = DBdata[userName][index].createCopyWithData(currentCourse, data);
             return DBdata[userName];
         }
     };
@@ -1185,16 +1204,67 @@ TodoService = __WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __decorate */]([
 
 
 var CourseItemComponent = (function () {
-    function CourseItemComponent() {
+    function CourseItemComponent(elementRef) {
+        this.elementRef = elementRef;
         this.deleteCourse = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
         this.editCourse = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
         this.checkCourseItem = new __WEBPACK_IMPORTED_MODULE_1__angular_core__["EventEmitter"]();
     }
-    CourseItemComponent.prototype.mouseDown = function (course) {
-        //console.log('mouse down');
-        // console.log(coord.left);
-        // console.log(coord.right);
+    CourseItemComponent.prototype.mouseDown = function (course, $event) {
+        // if ($event.target.type !== 'button') {
+        var box = this.elementRef.nativeElement.getBoundingClientRect();
+        this.shiftX = this.coord.left - box.left + pageXOffset;
+        this.shiftY = this.coord.top - box.top + pageYOffset;
         this.checkCourseItem.emit(course);
+        // 	console.log('child', this.coord.left, this.coord.top);
+        // 	document.onmousemove = () => {
+        // 		this.moveAt();
+        // 	};
+        // };
+    };
+    CourseItemComponent.prototype.ngAfterContentInit = function () {
+        var _this = this;
+        var blueberries = this.elementRef.nativeElement;
+        blueberries.ondragstart = function () {
+            return false;
+        };
+        // this.coord.left = $event.pageX;
+        // this.coord.top = $event.pageY;
+        blueberries.onmousedown = function (e) {
+            //var clientRect = getClientRect(blueberries);
+            var box = _this.elementRef.nativeElement.getBoundingClientRect();
+            var shiftX = _this.coord.left - box.left + pageXOffset;
+            var shiftY = _this.coord.top - box.top + pageYOffset;
+            blueberries.style.position = 'absolute';
+            moveAt(shiftX, shiftY);
+            document.onmousemove = function (e) {
+                moveAt(shiftX, shiftY);
+            };
+            blueberries.onmouseup = function () {
+                document.onmousemove = null;
+                blueberries.onmouseup = null;
+            };
+        };
+        var moveAt = function (shiftX, shiftY) {
+            blueberries.style.left = _this.coord.left - _this.shiftX + 'px';
+            blueberries.style.top = _this.coord.top - _this.shiftY + 'px';
+        };
+        function getClientRect(elem) {
+            var box = elem.getBoundingClientRect();
+            return {
+                top: box.top + pageYOffset,
+                left: box.left + pageXOffset
+            };
+        }
+    };
+    CourseItemComponent.prototype.moveAt = function () {
+        console.dir(this.elementRef);
+        console.log(' this.coord.left', this.coord.left);
+        console.log('this.shiftX', this.shiftX);
+        console.log(' this.coord.left - this.shiftX ', this.coord.left - this.shiftX + 'px');
+        console.dir(this.elementRef.nativeElement.style.left);
+        this.elementRef.nativeElement.style.left = this.coord.left - this.shiftX + 'px';
+        this.elementRef.nativeElement.style.top = this.coord.top - this.shiftY + 'px';
     };
     // public event() {
     // 	var blueberries = document.getElementById('blueberries');
@@ -1203,8 +1273,6 @@ var CourseItemComponent = (function () {
     // 	};
     // 	blueberries.onmousedown = function (e) {
     // 		var clientRect = getClientRect(blueberries);
-    // 		var shiftX = e.pageX - clientRect.left;
-    // 		var shiftY = e.pageY - clientRect.top;
     // 		blueberries.style.position = 'absolute';
     // 		document.body.appendChild(blueberries);
     // 		moveAt(e, shiftX, shiftY);
@@ -1216,13 +1284,9 @@ var CourseItemComponent = (function () {
     // 			blueberries.onmouseup = null;
     // 		};
     // 	}
-    // 	function moveAt(e, shiftX, shiftY) {
-    // 		blueberries.style.left = e.pageX - shiftX + 'px';
-    // 		blueberries.style.top = e.pageY - shiftY + 'px';
-    // 	}
-    // }
     CourseItemComponent.prototype.onEditCourse = function (course) {
         this.editCourse.emit(course);
+        //this.ref.markForCheck();
     };
     CourseItemComponent.prototype.onDeleteCourse = function (course) {
         this.deleteCourse.emit(course);
@@ -1255,9 +1319,9 @@ CourseItemComponent = __WEBPACK_IMPORTED_MODULE_0_tslib__["a" /* __decorate */](
         template: __webpack_require__(107),
         styles: [__webpack_require__(119)],
         providers: [],
-        encapsulation: __WEBPACK_IMPORTED_MODULE_1__angular_core__["ViewEncapsulation"].None
+        encapsulation: __WEBPACK_IMPORTED_MODULE_1__angular_core__["ViewEncapsulation"].None,
     }),
-    __WEBPACK_IMPORTED_MODULE_0_tslib__["b" /* __metadata */]("design:paramtypes", [])
+    __WEBPACK_IMPORTED_MODULE_0_tslib__["b" /* __metadata */]("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__angular_core__["ElementRef"]])
 ], CourseItemComponent);
 
 
@@ -1997,7 +2061,7 @@ module.exports = "<div>\r\n\t<nav class=\"main-navbar\">\r\n\t\t<div class=\"con
 /* 107 */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"list-group course-item\" (mousedown)=\"mouseDown(course)\">\r\n\t<header class=\"list-group-item\">\r\n\t\t<h4 class=\"overflow\">{{course.name}}</h4>\r\n\t</header>\r\n\t<main class=\"list-group-item top-border-none\">\r\n\t\t<div>\r\n\t\t\t<h5 class=\"overflow\">{{course.description}}</h5>\r\n\t\t\t<h5 class=\"overflow\">Cases</h5>\r\n\t\t\t<div class=\"text-right\">{{course.date | date : 'MMM, dd yyyy: HH:mm'}}</div>\r\n\t\t\t<div class=\"text-right\">{{course.duration}}</div>\r\n\t\t</div>\r\n\t</main>\r\n\t<footer class=\"list-group-item\">\r\n\t\t<div class=\"text-right\">\r\n\t\t\t<button type=\"button\" class=\"btn-link btn-xs\" (click)=onEditCourse(course)>Edit</button>\r\n\t\t\t<button type=\"button\" class=\"btn-link btn-xs\" (click)=onDeleteCourse(course)>Delete</button>\r\n\t\t</div>\r\n\t</footer>\r\n</div>\r\n"
+module.exports = "<div class=\"list-group course-item\" (mousedown)=\"mouseDown(course, $event)\">\r\n\t<header class=\"list-group-item\">\r\n\t\t<h4 class=\"overflow\">{{course.name}}</h4>\r\n\t</header>\r\n\t<main class=\"list-group-item top-border-none\">\r\n\t\t<div>\r\n\t\t\t<h5 class=\"overflow\">{{course.description}}</h5>\r\n\t\t\t<h5 class=\"overflow\">Cases</h5>\r\n\t\t\t<div class=\"text-right\">{{course.date | date : 'MMM, dd yyyy: HH:mm'}}</div>\r\n\t\t\t<div class=\"text-right\">{{course.duration}}</div>\r\n\t\t</div>\r\n\t</main>\r\n\t<footer class=\"list-group-item\">\r\n\t\t<div class=\"text-right\">\r\n\t\t\t<button type=\"button\" class=\"btn-link btn-xs\" (click)=onEditCourse(course)>Edit</button>\r\n\t\t\t<button type=\"button\" class=\"btn-link btn-xs\" (click)=onDeleteCourse(course)>Delete</button>\r\n\t\t</div>\r\n\t</footer>\r\n</div>\r\n"
 
 /***/ }),
 /* 108 */
