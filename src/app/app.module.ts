@@ -24,7 +24,8 @@ import { AppComponent } from './app.component';
 import { NoContentComponent } from './pages/no-content';
 
 // Components
-import { HeaderModule, FooterModule, AuthenticationModule, BlueberriesModule } from './core/components';
+import { HeaderModule, FooterModule } from './core/components';
+import { AuthenticationModule, BlueberriesModule } from './core/components';
 
 // Pages
 import { HomeModule } from './pages/home';

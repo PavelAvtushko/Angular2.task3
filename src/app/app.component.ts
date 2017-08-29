@@ -37,7 +37,6 @@ export class AppComponent implements OnInit {
 		this.shift = {
 			shiftX: $event.pageX - box.left - pageXOffset,
 			shiftY: $event.pageY - box.top - pageYOffset
-		}
-		console.dir(this.shift)
+		};
 	}
 }

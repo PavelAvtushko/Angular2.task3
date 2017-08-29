@@ -1,4 +1,5 @@
-import { Component, ViewEncapsulation, ChangeDetectionStrategy, ElementRef, EventEmitter, Input, Output } from '@angular/core';
+import { ElementRef, EventEmitter, Input, Output, AfterViewInit } from '@angular/core';
+import { Component, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { AuthenticationService } from '../../services';
 
 @Component({
@@ -9,7 +10,7 @@ import { AuthenticationService } from '../../services';
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BlueberriesComponent {
+export class BlueberriesComponent implements AfterViewInit {
 
 	public imagePath: string = 'http://miles.by/blueberries.png';
 	@Input() public shift: any;
@@ -34,19 +35,19 @@ export class BlueberriesComponent {
 			document.body.appendChild(this.elementRef.nativeElement);
 			this.moveAt($event);
 
-			document.onmousemove = ($event) => {
-				this.moveAt($event);
+			document.onmousemove = (e) => {
+				this.moveAt(e);
 			};
-		}
+		};
+	}
+
+	public mouseUp() {
+		document.onmousemove = null;
+		this.elementRef.nativeElement.onmouseup = null;
 	}
 
 	private moveAt(e) {
 		this.elementRef.nativeElement.style.left = e.pageX - this.shift.shiftX + 'px';
 		this.elementRef.nativeElement.style.top = e.pageY - this.shift.shiftY + 'px';
-	}
-
-	private mouseUp() {
-		document.onmousemove = null;
-		this.elementRef.nativeElement.onmouseup = null;
-	}
-}
+	};
+};

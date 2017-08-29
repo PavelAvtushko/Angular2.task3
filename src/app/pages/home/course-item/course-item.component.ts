@@ -1,4 +1,4 @@
-import { ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { ElementRef, ChangeDetectionStrategy,  AfterViewInit } from '@angular/core';
 import { Component, ViewEncapsulation, EventEmitter, Input, Output } from '@angular/core';
 import { CourseItem } from '../../../core/entities';
 
@@ -11,7 +11,7 @@ import { CourseItem } from '../../../core/entities';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class CourseItemComponent {
+export class CourseItemComponent implements AfterViewInit {
 
 	@Input() public course: CourseItem;
 	@Input() public shift: any;
@@ -42,10 +42,10 @@ export class CourseItemComponent {
 			document.body.appendChild(this.elementRef.nativeElement);
 			this.moveAt($event);
 
-			document.onmousemove = ($event) => {
-				this.moveAt($event);
+			document.onmousemove = (e) => {
+				this.moveAt(e);
 			};
-		}
+		};
 	}
 
 	public onEditCourse(course: CourseItem): void {
@@ -56,18 +56,18 @@ export class CourseItemComponent {
 		this.deleteCourse.emit(course);
 	}
 
-	private moveAt(e) {
-		this.elementRef.nativeElement.style.left = e.pageX - this.shift.shiftX + 'px';
-		this.elementRef.nativeElement.style.top = e.pageY - this.shift.shiftY + 'px';
-	}
-
-	private mouseUp($event) {
+	public mouseUp($event) {
 		if ($event.target.type === 'button') {
 			return;
 		}
 		document.onmousemove = null;
 		this.elementRef.nativeElement.onmouseup = null;
 		this.removeLeftStyle();
+	}
+
+	private moveAt(e) {
+		this.elementRef.nativeElement.style.left = e.pageX - this.shift.shiftX + 'px';
+		this.elementRef.nativeElement.style.top = e.pageY - this.shift.shiftY + 'px';
 	}
 
 	private removeLeftStyle() {

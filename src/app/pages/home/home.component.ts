@@ -65,15 +65,15 @@ export class HomeComponent implements OnInit, OnDestroy {
 		this.showForm(false);
 	}
 
-	public chooseCourseItem = ({$event, element }): void => {
+	public chooseCourseItem = ({ $event, element }): void => {
 		const box = element.getBoundingClientRect();
 
 		this.shift = {
 			shiftX: $event.pageX - box.left - pageXOffset,
 			shiftY: $event.pageY - box.top - pageYOffset
-		}
+		};
 	}
-	
+
 	public editCourse = (course: CourseItem): void => {
 		this.courseData = course;
 		this.showForm(true);
