@@ -24,7 +24,7 @@ import { AppComponent } from './app.component';
 import { NoContentComponent } from './pages/no-content';
 
 // Components
-import { HeaderModule, FooterModule, AuthenticationModule } from './core/components';
+import { HeaderModule, FooterModule, AuthenticationModule, BlueberriesModule } from './core/components';
 
 // Pages
 import { HomeModule } from './pages/home';
@@ -61,6 +61,7 @@ const APP_PROVIDERS = [
 		HeaderModule,
 		FooterModule,
 		AuthenticationModule,
+		BlueberriesModule,
 		HomeModule,
 		PageOneModule,
 		PageTwoModule

@@ -84,7 +84,7 @@ export class CourseService {
 	public updateItem(userName: string, data: CourseItem) {
 		if (DBdata[userName]) {
 			const currentCourse = DBdata[userName].find((item) => {
-				return item.id === data.id
+				return item.id === data.id;
 			});
 			currentCourse.modifyCourse(data);
 			let index = DBdata[userName].indexOf(currentCourse);

@@ -1,4 +1,5 @@
-import { Component, ViewEncapsulation, EventEmitter, Input, Output, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewEncapsulation, EventEmitter, Input, Output } from '@angular/core';
 import { CourseItem } from '../../../core/entities';
 
 @Component({
@@ -7,130 +8,73 @@ import { CourseItem } from '../../../core/entities';
 	styles: [require('./course-item.component.scss')],
 	providers: [],
 	encapsulation: ViewEncapsulation.None,
-	//changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class CourseItemComponent {
-	private shiftX: number;
-	private shiftY: number;
+
 	@Input() public course: CourseItem;
-	@Input() public coord: any;
+	@Input() public shift: any;
 	@Output() public deleteCourse: EventEmitter<CourseItem> = new EventEmitter<CourseItem>();
 	@Output() public editCourse: EventEmitter<CourseItem> = new EventEmitter<CourseItem>();
-	@Output() public checkCourseItem: EventEmitter<CourseItem> = new EventEmitter<CourseItem>();
-
-
+	@Output() public chooseCourseItem: EventEmitter<any> = new EventEmitter<any>();
 	constructor(private elementRef: ElementRef) {
 	}
 
-	public mouseDown(course, $event) {
-		// if ($event.target.type !== 'button') {
-
-			const box = this.elementRef.nativeElement.getBoundingClientRect();
-			this.shiftX = this.coord.left - box.left + pageXOffset;
-			this.shiftY = this.coord.top - box.top + pageYOffset;
-
-		 	this.checkCourseItem.emit(course);
-		// 	console.log('child', this.coord.left, this.coord.top);
-		// 	document.onmousemove = () => {
-
-		// 		this.moveAt();
-		// 	};
-		// };
+	public mouseDown($event) {
+		if ($event.target.type === 'button') {
+			return;
+		}
+		const element = this.elementRef.nativeElement;
+		this.chooseCourseItem.emit({ $event, element });
 	}
 
-	public ngAfterContentInit() {
-	
-		var blueberries = this.elementRef.nativeElement;
-
-		blueberries.ondragstart = function () {
+	public ngAfterViewInit() {
+		this.elementRef.nativeElement.ondragstart = () => {
 			return false;
 		};
 
-		// this.coord.left = $event.pageX;
-		// this.coord.top = $event.pageY;
+		this.elementRef.nativeElement.onmousedown = ($event) => {
+			if ($event.target.type === 'button') {
+				return;
+			}
+			this.elementRef.nativeElement.style.position = 'absolute';
+			document.body.appendChild(this.elementRef.nativeElement);
+			this.moveAt($event);
 
-		blueberries.onmousedown = (e) => {
-			
-			//var clientRect = getClientRect(blueberries);
-			var box = this.elementRef.nativeElement.getBoundingClientRect();
-			var shiftX = this.coord.left - box.left + pageXOffset;
-			var shiftY = this.coord.top - box.top + pageYOffset;
-
-			blueberries.style.position = 'absolute';
-
-			moveAt(shiftX, shiftY);
-
-			document.onmousemove = (e) => {
-				moveAt(shiftX, shiftY);
-			};
-
-			blueberries.onmouseup = function() {
-				document.onmousemove = null;
-				blueberries.onmouseup = null;
+			document.onmousemove = ($event) => {
+				this.moveAt($event);
 			};
 		}
-
-		const moveAt = (shiftX, shiftY) => {
-			blueberries.style.left = this.coord.left - this.shiftX + 'px';
-			blueberries.style.top = this.coord.top - this.shiftY + 'px';
-		}
-
-		function getClientRect(elem) {
-			var box = elem.getBoundingClientRect();
-
-			return {
-				top: box.top + pageYOffset,
-				left: box.left + pageXOffset
-			};
-		}
-
 	}
-
-	public moveAt() {
-		console.dir(this.elementRef);
-
-		console.log(' this.coord.left', this.coord.left);
-		console.log('this.shiftX', this.shiftX);
-		console.log(' this.coord.left - this.shiftX ', this.coord.left - this.shiftX + 'px');
-		console.dir(this.elementRef.nativeElement.style.left);
-		this.elementRef.nativeElement.style.left = this.coord.left - this.shiftX + 'px';
-		this.elementRef.nativeElement.style.top = this.coord.top - this.shiftY + 'px';
-	}
-
-	// public event() {
-
-	// 	var blueberries = document.getElementById('blueberries');
-
-	// 	blueberries.ondragstart = function () {
-	// 		return false;
-	// 	};
-
-	// 	blueberries.onmousedown = function (e) {
-	// 		var clientRect = getClientRect(blueberries);
-
-
-	// 		blueberries.style.position = 'absolute';
-	// 		document.body.appendChild(blueberries);
-	// 		moveAt(e, shiftX, shiftY);
-
-	// 		document.onmousemove = function (e) {
-	// 			moveAt(e, shiftX, shiftY);
-	// 		};
-
-	// 		blueberries.onmouseup = function () {
-	// 			document.onmousemove = null;
-	// 			blueberries.onmouseup = null;
-	// 		};
-	// 	}
 
 	public onEditCourse(course: CourseItem): void {
 		this.editCourse.emit(course);
-		//this.ref.markForCheck();
 	}
 
 	public onDeleteCourse(course: CourseItem): void {
 		this.deleteCourse.emit(course);
+	}
+
+	private moveAt(e) {
+		this.elementRef.nativeElement.style.left = e.pageX - this.shift.shiftX + 'px';
+		this.elementRef.nativeElement.style.top = e.pageY - this.shift.shiftY + 'px';
+	}
+
+	private mouseUp($event) {
+		if ($event.target.type === 'button') {
+			return;
+		}
+		document.onmousemove = null;
+		this.elementRef.nativeElement.onmouseup = null;
+		this.removeLeftStyle();
+	}
+
+	private removeLeftStyle() {
+		this.elementRef.nativeElement.style.left = '0';
+		this.elementRef.nativeElement.style.top = '0';
+		this.elementRef.nativeElement.style.position = 'relative';
+		document.getElementById('courseList').appendChild(this.elementRef.nativeElement);
 	}
 
 }

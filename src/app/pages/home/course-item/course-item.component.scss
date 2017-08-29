@@ -3,11 +3,13 @@
 .course-item {
     width: 300px;
     margin: 5px;
-
+    user-select:none;
+    
     .overflow {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    
     }
 
     main, footer {

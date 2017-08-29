@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, OnInit, OnDestroy, Input} from '@angular/core';
+import { Component, ViewEncapsulation, OnInit, OnDestroy, Input } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Pipe, PipeTransform, ElementRef } from '@angular/core';
 import { CourseService, ChartService, AuthenticationService } from '../../core/services';
@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 	private isShowingForm: boolean = false;
 	private chartData: any;
 	private chartName: string;
-	private coord = {left:0, top:0};
+	private shift = { shiftX: 0, shiftY: 0 };
 	private userName: string;
 
 	constructor(
@@ -65,16 +65,15 @@ export class HomeComponent implements OnInit, OnDestroy {
 		this.showForm(false);
 	}
 
-	public checkCourseItem = (course: CourseItem): void => {
-		console.log('mousedown on element', course);
-		//console.log(this.coord.left, this.coord.top);
-	}
+	public chooseCourseItem = ({$event, element }): void => {
+		const box = element.getBoundingClientRect();
 
-	public hand ($event){
-		this.coord.left = $event.pageX;
-		this.coord.top = $event.pageY;
+		this.shift = {
+			shiftX: $event.pageX - box.left - pageXOffset,
+			shiftY: $event.pageY - box.top - pageYOffset
+		}
 	}
-
+	
 	public editCourse = (course: CourseItem): void => {
 		this.courseData = course;
 		this.showForm(true);

@@ -24,10 +24,20 @@ import { AppState } from './app.service';
 })
 export class AppComponent implements OnInit {
 	public userName: string;
+	private shift = { shiftX: 0, shiftY: 0 };
 
 	constructor() {
 	}
 
 	public ngOnInit() {
+	}
+
+	public chooseCourseItem = ({$event, element }): void => {
+		const box = element.getBoundingClientRect();
+		this.shift = {
+			shiftX: $event.pageX - box.left - pageXOffset,
+			shiftY: $event.pageY - box.top - pageYOffset
+		}
+		console.dir(this.shift)
 	}
 }
